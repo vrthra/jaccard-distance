@@ -29,7 +29,8 @@ def load_mutants(fname):
             found_by_seed = line['found_by_seed']
             if found_by_seed == '1': continue
             time_found = line['time_found']
-            if time_found == '': continue
+            confirmed = line['confirmed']
+            if confirmed != '1': continue
             if fuzzer not in FUZZERS: FUZZERS[fuzzer] = {}
             if prog not in FUZZERS[fuzzer]: FUZZERS[fuzzer][prog] = []
             FUZZERS[fuzzer][prog].append('%s:%s' % (line['prog'], line['mut_id']))
@@ -39,7 +40,7 @@ def load_mutants(fname):
 data_file = sys.argv[1]
 
 data = load_mutants(data_file)
-print(len(data))
+print('Mutants Killed', len(data))
 
 fuzzers = list(FUZZERS.keys())
 #print(fuzzers)
@@ -47,4 +48,4 @@ fuzzers = list(FUZZERS.keys())
 print('Jaccard Distane (dissimilarity)')
 for a,b in I.combinations(fuzzers, 2):
     distance = jaccard_distance(a,b)
-    print( a, b, ':', distance)
+    print( a, b, ':', round(distance, 2))

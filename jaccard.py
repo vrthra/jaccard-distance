@@ -16,6 +16,20 @@ def jaccard_distance(Fa, Fb):
     return 1 - jaccard_index(Fa, Fb)
 
 
+def jaccard_index_p(Fa, Fb, prog):
+    ALL_A = [m for m in FUZZERS[Fa][prog]]
+    ALL_B = [m for m in FUZZERS[Fb][prog]]
+
+    intersection = [m for m in ALL_A if m in ALL_B]
+    union = list(set(ALL_A + ALL_B))
+    return len(intersection) / len(union)
+
+
+def jaccard_distance_p(Fa, Fb, prog):
+    return 1 - jaccard_index_p(Fa, Fb, prog)
+
+
+
 # exec_id,prog,mut_id,run_ctr,fuzzer,mut_type,covered_file_seen,covered_by_seed,time_found,found_by_seed,
 # total_time,confirmed,seed_timeout,crashed,stage
 def load_mutants(fname):
@@ -46,6 +60,18 @@ fuzzers = list(FUZZERS.keys())
 #print(fuzzers)
 
 print('Jaccard Distane (dissimilarity)')
-for a,b in I.combinations(fuzzers, 2):
-    distance = jaccard_distance(a,b)
-    print( a, b, ':', round(distance, 2))
+#for a,b in I.combinations(fuzzers, 2):
+#    distance = jaccard_distance(a,b)
+#    print( a, b, ':', round(distance, 2))
+
+for prog in FUZZERS[fuzzers[0]]:
+    print(prog)
+    for fA in fuzzers:
+        total = 0
+        for fB in fuzzers:
+            if fA == fB: continue
+            distance = jaccard_distance_p(fA,fB, prog)
+            total += distance
+            print( fA, fB, ':', round(distance, 2))
+        print(round(total/(len(fuzzers)-1), 2))
+    print()
